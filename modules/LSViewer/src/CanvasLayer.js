@@ -184,11 +184,11 @@ define(['jquery', 'pubsub'], function($, pubsub) {
 				activElems = getElemsByYs(self.coords);
 			}
 			for (var i in activElems) {
-				activElems[i].onSelected(self.coords, self.mouseCoordsIni, self.mouseCoordsEnd, clicked, mouseUp, self.ctrlPressed);
-				if (activElems[i].getType() == 'CURSOR') {		
+				if (activElems[i].getType() == 'CURSOR') {
 					activElems[i].setCursorEditable(true);		
 				}		
 				activElems[i].enable();
+				activElems[i].onSelected(self.coords, self.mouseCoordsIni, self.mouseCoordsEnd, clicked, mouseUp, self.ctrlPressed);
 			}
 			self.refresh();
 		}
@@ -349,7 +349,7 @@ define(['jquery', 'pubsub'], function($, pubsub) {
 		var elem;
 		for (var name in this.elems) {
 			elem = this.elems[name];
-			if (elem.isEnabled() && (elem.getType() === 'CURSOR' || elem.getType() === 'NOT_INTERACTIVE')) {
+			if ((elem.isEnabled() && elem.getType() === 'CURSOR') || elem.getType() === 'NOT_INTERACTIVE') {
 				//drawing cursor for notesManager, chordsManager and AudioCursor (selection cursor)
 				elem.drawCursor(this.ctx);
 			}
