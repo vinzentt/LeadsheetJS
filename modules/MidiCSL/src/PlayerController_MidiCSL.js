@@ -35,9 +35,11 @@ define([
 		$.subscribe('ToPlayer-stop', function(el) {
 			self.stop();
 		});
-		$.subscribe("NoteSpace-CursorPosChanged", function(){
-			self.stop();
-			self.play();
+		$.subscribe("NoteSpace-CursorPosChanged", function(el, cursorStart, cursorEnd){
+			if (cursorStart !== 0 && cursorEnd !== 0 && self.model.playState) {
+				self.stop();
+				self.play();
+			}
 		});
 		$.subscribe('ToPlayer-pause', function(el) {
 			self.pause();

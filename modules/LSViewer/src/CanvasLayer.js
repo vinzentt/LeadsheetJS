@@ -266,7 +266,7 @@ define(['jquery', 'pubsub'], function($, pubsub) {
 			return false;
 		}
 
-		$('html').on('mousemove',function(evt) {
+		$(this.canvasLayer).on('mousemove',function(evt) {
 			//draw cursor selection
 			var xy = self._getXandY($(self.canvasLayer), evt);
 			if (self.mouseDown) {
@@ -375,7 +375,7 @@ define(['jquery', 'pubsub'], function($, pubsub) {
 	CanvasLayer.prototype.destroy = function() {
 		$('html').off('mousedown');
 		$('html').off('mouseup');
-		$('html').off('mousemove');
+		$(this.canvasLayer).off('mousemove');
 		$.unsubscribe('ctrlPressed');
 		$.unsubscribe('ctrlUnpressed');
 		$.unsubscribe('CanvasLayer-refresh');

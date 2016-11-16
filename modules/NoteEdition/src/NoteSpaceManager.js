@@ -37,11 +37,13 @@ define([
 	}
 
 	/* private functions */
-	var _changeCursorPosition = function(newPos) {
-		if (newPos) {
+	var _changeCursorPosition = function(newPos, fireEvent) {
+		if (newPos && this.cursor.getPos() !== newPos) {
 			this.cursor.setPos(newPos);
 			//when clicking on a note, if there is an audio player, cursor should be updated
-			$.publish('NoteSpace-CursorPosChanged', this.cursor.getPos()); // getPos() returns array, of two elements, each element will be one parameter
+			if (fireEvent !== false) {
+				$.publish('NoteSpace-CursorPosChanged', this.cursor.getPos()); // getPos() returns array, of two elements, each element will be one parameter
+			}
 		}
 	}
 
@@ -182,7 +184,7 @@ define([
 	NoteSpaceManager.prototype.disable = function() {
 		if (!this.playing){ 		//if 'NOT_INTERACTIVE' depends if playing
 			this.enabled = false;
-			_changeCursorPosition.apply(this, [[0,0]]);
+			_changeCursorPosition.apply(this, [[0,0], false]);
 		}
 	};
 	/**
