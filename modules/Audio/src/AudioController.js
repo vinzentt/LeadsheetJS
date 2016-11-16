@@ -6,7 +6,8 @@ define(
 		 * @param {Number} timeEndSong given in seconds 
 		 */
 		function AudioController(song) {
-			this.song = song;
+			this.song = song.clone();
+			this.song.unfold();
 			this.audioCtx = new AudioContext();
 			this.sources = [];
 			this.isEnabled = false; //accessed publicly

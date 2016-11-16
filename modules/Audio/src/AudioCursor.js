@@ -29,6 +29,9 @@ define([
 
 		});
 		$.subscribe("NoteSpace-CursorPosChanged", function(el, cursorStart, cursorEnd) {
+			// first convert to unfolded indexes
+			cursorStart = self.audioController.song.notesMapper.getFirstUnfoldedIdx(cursorStart);
+			cursorEnd = self.audioController.song.notesMapper.getFirstUnfoldedIdx(cursorEnd);
 			var beats = self.audioController.song.getComponent('notes').getBeatIntervalByIndexes(cursorStart, cursorEnd);
 			var startTime = self.audioController.beatDuration * (beats[0] - 1);
 			$.publish('AudioCursor-clickedAudio', startTime);

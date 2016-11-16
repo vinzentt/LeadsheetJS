@@ -64,12 +64,14 @@ define(
 			});
 			$.subscribe("AudioCursor-clickedAudio", function(el, posCursor) {
 				self.startPos = posCursor;
-				self.audio.pausedAt = null;
-			 	self.audio.disableLoop();
-			 	self.audio.stop();
-			 	if (self.startPos) {
-			 		self.audio.play(self.startPos);
-			 	}
+				if (self.audio.isPlaying){
+					self.audio.pausedAt = null;
+				 	self.audio.disableLoop();
+				 	self.audio.stop();
+				 	if (self.startPos) {
+				 		self.audio.play(self.startPos);
+				 	}
+				 }
 			});
 			$.subscribe("AudioCursor-selectedAudio", function(el, startPos, endPos) {
 				self.startPos = startPos;

@@ -65,16 +65,17 @@ define([
 
 		});
 		if (self.CL_TYPE === 'NOT_INTERACTIVE'){
-			$.subscribe('ToPlayer-play', function(){
-				self.enable();	
+			var _activate = function() {
+				self.enable();
 				self.playing = true;
-			});
-			$.subscribe('ToPlayer-stop', function(){
+			};
+			var _unactivate = function(){
 				self.playing = false;
-			});	
-			$.subscribe('ToPlayer-pause', function(){
-				self.playing = false;
-			});
+			};
+			$.subscribe('ToPlayer-playPause', _activate);
+			$.subscribe('ToPlayer-play', _activate);
+			$.subscribe('ToPlayer-stop', _unactivate);	
+			$.subscribe('ToPlayer-pause', _unactivate);
 		}
 		$.subscribe('ctrl-a', function() {
 			if (!self.interactive) return;
