@@ -67,16 +67,6 @@ define([
 			this.cursorModel = options.cursorModel;
 			this.cursorNoteModel = options.cursorNoteModel;
 
-			this.chords = {
-				volume: initVolume,
-				tmpVolume: initVolume,
-				instrument: (typeof options.chordsInstrument !== "undefined") ? options.chordsInstrument : 0,
-			};
-			this.melody = {
-				volume: initVolume,
-				tmpVolume: initVolume,
-				instrument: (typeof options.melodyInstrument !== "undefined") ? options.melodyInstrument : 0,
-			};
 			this.activeMetronome = !!options.activeMetronome;
 			// When loop attributes is set to true, player will restart after the last note (indefinitively)
 			this.loop = !!options.loop;
@@ -320,46 +310,55 @@ define([
 
 					//Classes for playing Midi. Parent (abstract) class
 					var midiObj = {
-						init: function(playerModel, tempo, currentNote) {
-							this.currentNote = currentNote;
-							this.playerModel = playerModel;
+						init: function(tempo, noteModel) {
+							this.noteModel = noteModel;
 							this.tempo = tempo;
 							this.velocityMin = 30;
-							this.randomVelocityRange = 20;
+							this.randomVelocityRange = 25;
 						},
-						play: function(MIDI, notesToPlay, duration) {
+						play: function() {
 							MIDI.setVolume(this.getChannel(), this.getVolume());
-							var velocityNote = Math.random() * this.randomVelocityRange + this.velocityMin;
-							duration = duration ? duration : this.currentNote.getDuration() * (60 / this.tempo);
-							MIDI.chordOn(this.getChannel(), notesToPlay, velocityNote);
-							MIDI.chordOff(this.getChannel(), notesToPlay, duration);
+							MIDI.chordOn(this.getChannel(), this.getNotesToPlay(), this.getVelocity());
+							MIDI.chordOff(this.getChannel(), this.getNotesToPlay(), this.noteModel.getDuration() * (60 / this.tempo));
+						},
+						getNotesToPlay: function(){
+							return this.noteModel.getMidiNote();
 						},
 						getVolume: function() {
-							return this.volume * this.playerModel[this.type].volume;
+							return this.volume;
 						},
 						getChannel: function() {
-							return this.playerModel[this.type].instrument;
+							return this.channel;
+						}, 
+						getVelocity: function() {
+							return Math.random() * this.randomVelocityRange + this.velocityMin;
 						}
 					};
 					//child classes for notes, chords and metronome to play
 					var noteMidiObj = _.extendOwn(Object.create(midiObj), {
+						channel: 0,
 						type: 'melody',
-						volume: 127
+						volume: 127,
 					});
 					var chordsMidiObj = _.extendOwn(Object.create(midiObj), {
+						channel: 0,
 						type: 'chords',
-						volume: 80
+						volume: 70,
+						getVelocity: function() {
+							return this.velocityMin;
+						},
+						getNotesToPlay: function(){
+							return this.noteModel.getTransposeMidiNote(-12);
+						},
 					});
 					var metronomeMidiObj = _.extendOwn(Object.create(midiObj), {
+						channel: 9,
 						getVolume: function() {
 	                        return this.volume * this.playerModel.chords.volume;
                         },
 						volume: 80,
 						setPlay: function(play) {
 							this.doPlay = !!play;
-						},
-						getChannel: function() {
-							return 9;
 						}
 					});
 					//we put them in object
@@ -398,8 +397,8 @@ define([
 								});
 								_.forEach(notesToPlay, function(currentNote) {
 									var midiObject = midiTypes[currentNote.getType()];
-									midiObject.init(self, tempo, currentNote);
-									midiObject.play(MIDI, currentNote.getMidiNote());
+									midiObject.init(tempo, currentNote);
+									midiObject.play();
 								});
 								var melodyNotes = _.filter(notesToPlay, function(note) {
 									return note.getType() === 'melody';
@@ -473,6 +472,7 @@ define([
 			// check MIDI/Plugin.js for number (you have to remove 1)
 			var instruments = {
 				0: "acoustic_grand_piano",
+				// 1: "bright_acoustic_piano",
 				// 30 : "distortion_guitar",
 				// 24 : "acoustic_guitar_nylon",
 				// 25 : "acoustic_guitar_steel",
