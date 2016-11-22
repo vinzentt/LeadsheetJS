@@ -373,6 +373,21 @@ define([
 							var notesToPlay = _.filter(song, function(note) {
 								return note.getCurrentTime() === currentTime;
 							});
+							self.progressBar.setPositionInPercent(Date.now() - self._startTime);
+							var duration;
+							_.forEach(notesToPlay, function(currentNote) {
+								var midiObject = midiTypes[currentNote.getType()];
+								midiObject.init(tempo, currentNote);
+								midiObject.play();
+							});
+							var melodyNotes = _.filter(notesToPlay, function(note) {
+								return note.getType() === 'melody';
+							});
+							// console.log(melodyNotes, notesToPlay);
+							if (melodyNotes.length > 0) {
+								var pos = melodyNotes[0].tieNotesNumber ? [melodyNotes[0].getNoteIndex(), melodyNotes[0].getNoteIndex() + melodyNotes[0].tieNotesNumber - 1] : melodyNotes[0].getNoteIndex();
+								self.setPositionIndex(pos, unfoldedSong.notesMapper);
+							}
 							if (_.last(notesToPlay) === lastNote || currentTime * self.getBeatDuration(tempo) >= playTo) {
 								if (self.doLoop()) {
 									self.stop(true); // TODO stop on setTimeout Else make it buggy (but without reseting position)
@@ -391,24 +406,8 @@ define([
 										}
 										self.play(tempo, playFrom);
 									}
-								}), duration * 1000);
-							} else {
-								self.progressBar.setPositionInPercent(Date.now() - self._startTime);
-								var duration;
-								_.forEach(notesToPlay, function(currentNote) {
-									var midiObject = midiTypes[currentNote.getType()];
-									midiObject.init(tempo, currentNote);
-									midiObject.play();
-								});
-								var melodyNotes = _.filter(notesToPlay, function(note) {
-									return note.getType() === 'melody';
-								});
-								// console.log(melodyNotes, notesToPlay);
-								if (melodyNotes.length > 0) {
-									var pos = melodyNotes[0].tieNotesNumber ? [melodyNotes[0].getNoteIndex(), melodyNotes[0].getNoteIndex() + melodyNotes[0].tieNotesNumber - 1] : melodyNotes[0].getNoteIndex();
-									self.setPositionIndex(pos, unfoldedSong.notesMapper);
-								}
-							}
+								}), lastNote.getDuration() * 1000);
+							} 
 						}, currentTime * self.getBeatDuration(tempo) - playFrom));
 					};
 					// for each different position in the song
