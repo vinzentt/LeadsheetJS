@@ -6,8 +6,10 @@ define(
 		 * @param {Number} timeEndSong given in seconds 
 		 */
 		function AudioController(song) {
-			this.song = song.clone();
-			this.song.unfold();
+			this.song = song ? song.clone() : false;
+			if (this.song) {
+				this.song.unfold();
+			}
 			this.audioCtx = new AudioContext();
 			this.sources = [];
 			this.isEnabled = false; //accessed publicly
@@ -41,7 +43,7 @@ define(
 		};
 
 		AudioController.prototype._setParams = function(tempo) {
-			this.songNumBeats =  this.song.getSongTotalBeats();
+			this.songNumBeats =  this.song ? this.song.getSongTotalBeats() : 0;
 			this.beatDuration = 60 / tempo;
 			this.timeEndSong = this.beatDuration * this.songNumBeats; //song duration until last beat (without residual audi
 		};
