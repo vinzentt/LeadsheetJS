@@ -33,8 +33,6 @@ define([
 
 		});
 		$.subscribe("NoteSpace-CursorPosChanged", function(el, cursorStart, cursorEnd) {
-			console.log("NoteSpace-CursorPosChanged", cursorStart, cursorEnd)
-			var startTime, endTime;
 			// first convert to unfolded indexes
 			cursorStart = self.audioController.song.notesMapper.getFirstUnfoldedIdx(cursorStart);
 			cursorEnd = self.audioController.song.notesMapper.getFirstUnfoldedIdx(cursorEnd);
@@ -44,7 +42,6 @@ define([
 			if (cursorStart === cursorEnd) {
 				$.publish('AudioCursor-clickedAudio', startTime);
 			} else {
-				console.log(startTime, endTime)
 				$.publish('AudioCursor-selectedAudio', [startTime, endTime]);
 			}
 			//if audio is not being drawn, no need to move audio cursor

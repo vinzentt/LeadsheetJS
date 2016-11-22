@@ -24,7 +24,21 @@ define(
 			this.songNumBeats;
 			this.beatDuration;
 			this.timeEndSong;
+			// default tempo 120
+			this._setParams(120);
 		}
+
+		var _updateLoopOnSources = function() {
+			for (var i in this.sources) {
+				if (this.presetLoop) {
+					this.sources[i].loop = true;
+					this.sources[i].loopStart = this.presetLoop.from;
+					this.sources[i].loopEnd = this.presetLoop.to;
+				} else {
+					this.sources[i].loop = false;
+				}
+			}
+		};
 
 		AudioController.prototype._setParams = function(tempo) {
 			this.songNumBeats =  this.song.getSongTotalBeats();
@@ -136,12 +150,8 @@ define(
 			}
 			for (var i in this.sources) {
 				this.sources[i].start(0, offset);
-				if (this.presetLoop) {
-					this.sources[i].loop = true;
-					this.sources[i].loopStart = this.presetLoop.from;
-					this.sources[i].loopEnd = this.presetLoop.to;
-				}
 			}
+			_updateLoopOnSources.call(this);
 			this.isPlaying = true;
 
 			var self = this;
@@ -240,27 +250,25 @@ define(
 		AudioController.prototype.loop = function(from, to) {
 			from = from || this.startMargin;
 			to = to || this.timeEndSong + this.startMargin;
+			this.presetLoop = {
+				from: from,
+				to: to
+			};
 			if (this.isPlaying) {
-				this.source.loop = true;
-				this.source.loopStart = from;
-				this.source.loopEnd = to;
+				_updateLoopOnSources.call(this);
 				// this.offsetLoopOn is needed to get correct current time
 				var now = (Date.now() - this.startedAt) / 1000;
 				if (now > to) { // if cursor was after loop, we set offsetLoopOn
 					this.offsetLoopOn = now - from;
 				}
 			}
-			this.presetLoop = {
-				from: from,
-				to: to
-			};
 		};
 
 		AudioController.prototype.disableLoop = function() {
-			if (this.source && !this.loopSong){
+			if (this.sources && !this.loopSong){
 				this.startedAt = Date.now() - this._getCurrentPlayingTime(); // we update startedAt like if we had made play from here	
-				this.source.loop = false;
 				this.presetLoop = null;
+				_updateLoopOnSources.call(this);
 			}
 		};
 

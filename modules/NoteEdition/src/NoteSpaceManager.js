@@ -185,7 +185,7 @@ define([
 	NoteSpaceManager.prototype.disable = function() {
 		if (!this.playing){ 		//if 'NOT_INTERACTIVE' depends if playing
 			this.enabled = false;
-			_changeCursorPosition.apply(this, [[0,0], false]);
+			_changeCursorPosition.apply(this, [[0,0]]);
 		}
 	};
 	/**

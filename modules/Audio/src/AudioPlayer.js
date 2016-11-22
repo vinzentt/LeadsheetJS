@@ -64,9 +64,9 @@ define(
 			});
 			$.subscribe("AudioCursor-clickedAudio", function(el, startTime) {
 				self.startPos = startTime;
+			 	self.audio.disableLoop();
 				if (self.audio.isPlaying){
 					self.audio.pausedAt = null;
-				 	self.audio.disableLoop();
 				 	self.audio.stop();
 			 		self.audio.play(self.startPos);
 				 }
