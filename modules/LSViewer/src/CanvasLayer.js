@@ -157,6 +157,7 @@ define(['jquery', 'pubsub'], function($, pubsub) {
 					return [elem];
 				}
 			}
+			return [];
 		}
 
 		function resetElems() {
@@ -173,7 +174,7 @@ define(['jquery', 'pubsub'], function($, pubsub) {
 		 * @param  {Boolean} clicked true when clicked (mouseDown and mouseUp in same position) false when moved mouse onMouseDown
 		 */
 		function selection(clicked, mouseUp, event) {
-			var activElems;
+			var activElems = [];
 			var ctrlPressed = event && event.metaKey !== false
 			if (clicked) {
 				activElems = getOneActiveElement(self.coords);

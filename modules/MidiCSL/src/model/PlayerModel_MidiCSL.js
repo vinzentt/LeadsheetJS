@@ -367,26 +367,26 @@ define([
 						'chord': chordsMidiObj,
 						'metronome': metronomeMidiObj
 					};
-
 					var playNoteFn = function(currentTime) {
 						self.noteTimeOut.push(setTimeout(function() {
 							var notesToPlay = _.filter(song, function(note) {
 								return note.getCurrentTime() === currentTime;
 							});
-							self.progressBar.setPositionInPercent(Date.now() - self._startTime);
-							var duration;
-							_.forEach(notesToPlay, function(currentNote) {
-								var midiObject = midiTypes[currentNote.getType()];
-								midiObject.init(tempo, currentNote);
-								midiObject.play();
-							});
-							var melodyNotes = _.filter(notesToPlay, function(note) {
-								return note.getType() === 'melody';
-							});
-							// console.log(melodyNotes, notesToPlay);
-							if (melodyNotes.length > 0) {
-								var pos = melodyNotes[0].tieNotesNumber ? [melodyNotes[0].getNoteIndex(), melodyNotes[0].getNoteIndex() + melodyNotes[0].tieNotesNumber - 1] : melodyNotes[0].getNoteIndex();
-								self.setPositionIndex(pos, unfoldedSong.notesMapper);
+							if (!playTo || currentTime * self.getBeatDuration(tempo) < playTo) {
+								self.progressBar.setPositionInPercent(Date.now() - self._startTime);
+								_.forEach(notesToPlay, function(currentNote) {
+									var midiObject = midiTypes[currentNote.getType()];
+									midiObject.init(tempo, currentNote);
+									midiObject.play();
+								});
+								var melodyNotes = _.filter(notesToPlay, function(note) {
+									return note.getType() === 'melody';
+								});
+								// console.log(melodyNotes, notesToPlay);
+								if (melodyNotes.length > 0) {
+									var pos = melodyNotes[0].tieNotesNumber ? [melodyNotes[0].getNoteIndex(), melodyNotes[0].getNoteIndex() + melodyNotes[0].tieNotesNumber - 1] : melodyNotes[0].getNoteIndex();
+									self.setPositionIndex(pos, unfoldedSong.notesMapper);
+								}
 							}
 							if (_.last(notesToPlay) === lastNote || currentTime * self.getBeatDuration(tempo) >= playTo) {
 								if (self.doLoop()) {
