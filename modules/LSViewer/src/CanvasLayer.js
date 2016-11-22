@@ -27,7 +27,6 @@ define(['jquery', 'pubsub'], function($, pubsub) {
 		if (interactiveCanvasLayer) this._listenEvents(canvasLayer);
 		this.elems = {}; //elements to be added (can be CLICKABLE or CURSOR)
 		this.order = []; //we keep trace of order in which elements are added, to decide which should be prioritized on click
-		this.ctrlPressed = false;
 	}
 
 	CanvasLayer.prototype._createLayer = function(viewer) {
@@ -113,7 +112,8 @@ define(['jquery', 'pubsub'], function($, pubsub) {
 		 * E.g.2 if notes at top and chords at bottom of selection, we enable edition on notes and chords at the same time.
 		 * @param  {Object} coords e.g.:  {x:12, y:21}
 		 *
-		 * @return {Array}        array of active elements (being elements like ChordSpaceManager, NoteSpaceManager, WaveDrawer. TextElementManager will never be returned because it is not selectable (it does not have getY() function), it is only thought for being clicked)
+		 * @return {Array}      array of active elements (being elements like ChordSpaceManager, NoteSpaceManager, WaveDrawer. 
+		 *						TextElementManager will never be returned because it is not selectable (it does not have getY() function), it is only thought for being clicked)
 		 */
 		function getElemsByYs(coords) {
 			var minY = 999999,
@@ -172,10 +172,11 @@ define(['jquery', 'pubsub'], function($, pubsub) {
 		 * [selection description]
 		 * @param  {Boolean} clicked true when clicked (mouseDown and mouseUp in same position) false when moved mouse onMouseDown
 		 */
-		function selection(clicked, mouseUp) {
+		function selection(clicked, mouseUp, event) {
 			var cursorPos;
-			if (!self.ctrlPressed){
-				resetElems();
+			var ctrlPressed = event && event.metaKey !== false;
+			if (ctrlPressed){
+				// resetElems();
 			}
 			var activElems;
 			if (clicked) {
@@ -188,7 +189,7 @@ define(['jquery', 'pubsub'], function($, pubsub) {
 					activElems[i].setCursorEditable(true);		
 				}		
 				activElems[i].enable();
-				activElems[i].onSelected(self.coords, self.mouseCoordsIni, self.mouseCoordsEnd, clicked, mouseUp, self.ctrlPressed);
+				activElems[i].onSelected(self.coords, self.mouseCoordsIni, self.mouseCoordsEnd, clicked, mouseUp, ctrlPressed);
 			}
 			self.refresh();
 		}
@@ -254,7 +255,7 @@ define(['jquery', 'pubsub'], function($, pubsub) {
 				// $.publish('right-click');
 			} else {
 				if (isTargetValid(evt)) {
-					selection(isClick, true);
+					selection(isClick, true, evt);
 				}
 			}
 		}
@@ -275,7 +276,7 @@ define(['jquery', 'pubsub'], function($, pubsub) {
 				self._setCoords(self.mouseCoordsIni, self.mouseCoordsEnd);
 				self._clampCoords($(self.canvasLayer));
 				if (isTargetValid(evt)) {
-					selection();
+					selection(false, false, evt);
 				}
 			}
 			setPointerIfInPath(xy);
@@ -376,8 +377,6 @@ define(['jquery', 'pubsub'], function($, pubsub) {
 		$('html').off('mousedown');
 		$('html').off('mouseup');
 		$(this.canvasLayer).off('mousemove');
-		$.unsubscribe('ctrlPressed');
-		$.unsubscribe('ctrlUnpressed');
 		$.unsubscribe('CanvasLayer-refresh');
 	};
 	return CanvasLayer;
