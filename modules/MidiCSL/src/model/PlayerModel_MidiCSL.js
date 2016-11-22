@@ -370,7 +370,10 @@ define([
 
 					var playNoteFn = function(currentTime) {
 						self.noteTimeOut.push(setTimeout(function() {
-							if (currentTime * self.getBeatDuration(tempo) >= playTo) {
+							var notesToPlay = _.filter(song, function(note) {
+								return note.getCurrentTime() === currentTime;
+							});
+							if (_.last(notesToPlay) === lastNote || currentTime * self.getBeatDuration(tempo) >= playTo) {
 								if (self.doLoop()) {
 									self.stop(true); // TODO stop on setTimeout Else make it buggy (but without reseting position)
 								}
@@ -392,9 +395,6 @@ define([
 							} else {
 								self.progressBar.setPositionInPercent(Date.now() - self._startTime);
 								var duration;
-								var notesToPlay = _.filter(song, function(note) {
-									return note.getCurrentTime() === currentTime;
-								});
 								_.forEach(notesToPlay, function(currentNote) {
 									var midiObject = midiTypes[currentNote.getType()];
 									midiObject.init(tempo, currentNote);

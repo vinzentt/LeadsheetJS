@@ -173,16 +173,15 @@ define(['jquery', 'pubsub'], function($, pubsub) {
 		 * @param  {Boolean} clicked true when clicked (mouseDown and mouseUp in same position) false when moved mouse onMouseDown
 		 */
 		function selection(clicked, mouseUp, event) {
-			var cursorPos;
-			var ctrlPressed = event && event.metaKey !== false;
-			if (ctrlPressed){
-				// resetElems();
-			}
 			var activElems;
+			var ctrlPressed = event && event.metaKey !== false
 			if (clicked) {
 				activElems = getOneActiveElement(self.coords);
 			} else {
 				activElems = getElemsByYs(self.coords);
+			}
+			if (activElems.length <= 1 && ctrlPressed === false) {
+				resetElems();
 			}
 			for (var i in activElems) {
 				if (activElems[i].getType() == 'CURSOR') {
@@ -251,12 +250,8 @@ define(['jquery', 'pubsub'], function($, pubsub) {
 		function mouseUp(evt) {
 			self.mouseDown = false;
 			var isClick = self.mouseDidntMove();
-			if (isClick && evt.button == 2) {
-				// $.publish('right-click');
-			} else {
-				if (isTargetValid(evt)) {
-					selection(isClick, true, evt);
-				}
+			if (isTargetValid(evt)) {
+				selection(isClick, true, evt);
 			}
 		}
 		// check if we click on something that is canvas or that contain canvas to prevent click on something that is above a player or menu etc
