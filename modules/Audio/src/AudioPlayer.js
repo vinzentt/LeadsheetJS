@@ -62,18 +62,18 @@ define(
 					$.publish("Audioplayer-multitrackMixerInserted", {$element: self.$tplRendered});
 				}
 			});
-			$.subscribe("AudioCursor-clickedAudio", function(el, posCursor) {
-				self.startPos = posCursor;
+			$.subscribe("AudioCursor-clickedAudio", function(el, startTime) {
+				self.startPos = startTime;
 				if (self.audio.isPlaying){
 					self.audio.pausedAt = null;
 				 	self.audio.disableLoop();
 				 	self.audio.stop();
-				 	if (self.startPos) {
-				 		self.audio.play(self.startPos);
-				 	}
+			 		self.audio.play(self.startPos);
 				 }
 			});
 			$.subscribe("AudioCursor-selectedAudio", function(el, startPos, endPos) {
+				console.log("AudioCursor-selectedAudio");
+				console.log(arguments);
 				self.startPos = startPos;
 				self.endPos = endPos;
 				self.audio.loop(startPos, endPos);

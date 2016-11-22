@@ -1,8 +1,12 @@
 define([
 	'jquery',
+	'underscore',
 	'modules/Edition/src/ElementManager',
 	'modules/Cursor/src/CursorModel'
-], function($, ElementManager, CursorModel) {
+], function($, _, ElementManager, CursorModel) {
+	/**
+	 *	AudioCursor may not be drawn but will still be used to map note cursor pos with audio times
+	 */
 	function AudioCursor(audioController, audioPlayer, viewer, audioAnimation) {
 		this.CL_TYPE = 'CURSOR';
 		this.CL_NAME = 'audioCursor';
@@ -29,16 +33,24 @@ define([
 
 		});
 		$.subscribe("NoteSpace-CursorPosChanged", function(el, cursorStart, cursorEnd) {
+			console.log("NoteSpace-CursorPosChanged", cursorStart, cursorEnd)
+			var startTime, endTime;
 			// first convert to unfolded indexes
 			cursorStart = self.audioController.song.notesMapper.getFirstUnfoldedIdx(cursorStart);
 			cursorEnd = self.audioController.song.notesMapper.getFirstUnfoldedIdx(cursorEnd);
 			var beats = self.audioController.song.getComponent('notes').getBeatIntervalByIndexes(cursorStart, cursorEnd);
 			var startTime = self.audioController.beatDuration * (beats[0] - 1);
-			$.publish('AudioCursor-clickedAudio', startTime);
+			var endTime = self.audioController.beatDuration * (_.last(beats) - 1);
+			if (cursorStart === cursorEnd) {
+				$.publish('AudioCursor-clickedAudio', startTime);
+			} else {
+				console.log(startTime, endTime)
+				$.publish('AudioCursor-selectedAudio', [startTime, endTime]);
+			}
 			//if audio is not being drawn, no need to move audio cursor
 			if (!self.audioDrawer || !self.audioDrawer.isEnabled) return;
 			if (self.cursor) {
-				self.cursor.setPos([startTime, startTime]); //we equal cursor start and end cursor, because this way the player won't loop
+				self.cursor.setPos([startTime, endTime]); //we equal cursor start and end cursor, because this way the player won't loop
 				self.updateCursorPlaying(startTime);
 			}
 		});

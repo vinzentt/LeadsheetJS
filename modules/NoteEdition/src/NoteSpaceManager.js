@@ -126,7 +126,7 @@ define([
 		if (ctrlPressed){
 			posCursor = this.elemMng.getMergedCursors(posCursor, this.cursor.getPos());
 		}
-		_changeCursorPosition.apply(this, [posCursor]);
+		_changeCursorPosition.apply(this, [posCursor, mouseUp]);
 	};
 
 	/**
