@@ -265,7 +265,7 @@ define([
 			if (typeof tempo === "undefined" || isNaN(tempo)) {
 				tempo = 120;
 			}
-			this.emptyPlayNotes();
+			this.stopAllNotes();
 			var self = this;
 			this.playState = true;
 			$.publish('PlayerModel-onplay');
@@ -436,10 +436,6 @@ define([
 				window.clearTimeout(this.noteTimeOut[i]);
 			}
 			this.noteTimeOut = [];
-		};
-
-		PlayerModel_MidiCSL.prototype.emptyPlayNotes = function() {
-			this.stopAllNotes();
 		};
 
 		PlayerModel_MidiCSL.prototype.pause = function() {
