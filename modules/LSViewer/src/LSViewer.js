@@ -479,7 +479,7 @@ define([
 				if (this.canvasLayer) {
 					this.canvasLayer.destroy(); //to remove html listeners
 				}
-				this.canvasLayer = new CanvasLayer(this, this.detectEventOnAllDocument, this.INTERACTIVE_CANVAS_LAYER); //the canvasLayer needs to be created after the score has been drawn
+				this.canvasLayer = new CanvasLayer(this, this.INTERACTIVE_CANVAS_LAYER); //the canvasLayer needs to be created after the score has been drawn
 			}
 			this.noteViews = this._getNoteViewsArea(noteViews);
 			$.publish('LSViewer-drawEnd', this);
