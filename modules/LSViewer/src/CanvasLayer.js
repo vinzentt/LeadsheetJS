@@ -248,6 +248,8 @@ define(['jquery', 'pubsub'], function($, pubsub) {
 			return false;
 		}
 
+
+		var debouncedPointerInPath = _.debounce(setPointerIfInPath, 100);
 		$(this.canvasLayer).on('mousemove',function(evt) {
 			//draw cursor selection
 			var xy = self._getXandY($(self.canvasLayer), evt);
@@ -260,14 +262,8 @@ define(['jquery', 'pubsub'], function($, pubsub) {
 					selection(false, false, evt);
 				}
 			}
-			setPointerIfInPath(xy);
+			debouncedPointerInPath(xy);
 
-		});
-		$.subscribe('ctrlPressed', function(){
-			self.ctrlPressed = true;
-		});
-		$.subscribe('ctrlUnpressed', function(){
-			self.ctrlPressed = false;
 		});
 		$.subscribe('CanvasLayer-refresh', function() {
 			self.refresh();
