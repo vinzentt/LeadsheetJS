@@ -147,19 +147,15 @@ define([
 		LSViewer.prototype._initSubscribe = function() {
 			var self = this;
 			$.subscribe('ToViewer-draw', function(el, songModel, forceNewCanvasLayer) {
-				if (!songModel) {
-					throw "Need songModel to draw";
-				}
-				self.forceNewCanvasLayer = forceNewCanvasLayer;
-				self.draw(songModel);
+				$.publish('ToViewer-resize', [songModel, true])
 			});
 
-			$.subscribe('ToViewer-resize', function(el, songModel) {
+			$.subscribe('ToViewer-resize', function(el, songModel, forceDraw) {
 				if (!songModel) {
 					throw "Need songModel to draw";
 				}
 				var width = self._getWidthFromContainer(this.divContainer);
-				if (self.canvas.width !== width) {
+				if (self.canvas.width !== width || forceDraw) {
 					self.canvas.width = width;
 					self._resize(width);
 					self.forceNewCanvasLayer = true;
